@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TasksRun": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\windows\\inf"
+    }
+  }
+}
