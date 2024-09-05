@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
 
 internal class Program
 {
@@ -18,7 +17,7 @@ internal class Program
             Console.WriteLine("Пример: TasksRun c:\\windows\\inf");
             return;
         }
-        DirectoryInfo info = new DirectoryInfo(args[0]);
+        DirectoryInfo info = new (args[0]);
         var files = info.GetFiles();
         if (files.Length < 3)
         {
@@ -30,23 +29,21 @@ internal class Program
 
         Random rng = new ();
         var tasks = new Task<Result>[3];
-        var filesToTry = new FileInfo[3];
         var stopWatch = new Stopwatch();
         var fileCount = files.Length;
         stopWatch.Start();
         var i = 0;
-        foreach (var t in filesToTry)
+        foreach (var t in tasks)
         {
             var file = files[rng.Next(fileCount)];
-            filesToTry[i] = file;
-            tasks[i] = Task.Run(() =>
+            tasks[i++] = Task.Run(() =>
             {
                 return  ReadFileAndCountSpaces(file.FullName);
             });
-            i++;
         }
         Task.WaitAll(tasks);
-        WriteResult(stopWatch);
+        stopWatch.Stop();
+        Console.WriteLine($"Параллельное чтение файлов заняло время  (ms) {stopWatch.ElapsedMilliseconds}.");
         Console.WriteLine($"Сумма всех времен всех задач (ms):{tasks.Sum(_ => _.Result.ms)}");
 
 
@@ -56,12 +53,7 @@ internal class Program
     }
 
 
-    public static void WriteResult(Stopwatch stopWatch) {
-        stopWatch.Stop();
-        TimeSpan ts = stopWatch.Elapsed;
-        Console.WriteLine($"Параллельное чтение файлов заняло время  (ms) {stopWatch.ElapsedMilliseconds}.");
-    }
-
+ 
     /// <summary>
     /// Написать функцию, принимающую в качестве аргумента путь к папке. Из этой папки параллельно прочитать все файлы 
     /// и вычислить количество пробелов в них.
@@ -83,7 +75,8 @@ internal class Program
             });
         }
         Task.WaitAll(tasksAll);
-        WriteResult(stopWatch);
+        stopWatch.Stop();
+        Console.WriteLine($"Параллельное чтение файлов заняло время  (ms) {stopWatch.ElapsedMilliseconds}.");
         Console.WriteLine($"Сумма всех времен всех задач (ms):{tasksAll.Sum(_ => _.Result.ms)}. ");
 
     }
